@@ -10,10 +10,9 @@
 //#include <stdio.h>
 //#include <ctype.h>
 
-#include <demonio_comun.h>
-#include <midemonio.h>
 
-#define cimg_plugin "cimg_gpiv.h"
+
+//#define cimg_plugin "cimg_gpiv.h"
 #include <iostream>
 #include <CImg.h>
 

@@ -3,15 +3,15 @@
 #include "opencv2/core.hpp"
 
 
-#include "midemonio.h"
-#define cimg_plugin "cimg_gpiv.h"
+
+//#define cimg_plugin "cimg_gpiv.h"
 
 #include <CImg.h>
 using namespace cimg_library;
 
 #include "string_utilities.h"
 #include "file_utilities.h"
-#include "cimg_gpivfunctions.h"
+//#include "cimg_gpivfunctions.h"
 #include "CimgStereo.h"
 
 #define STEREOCALDIR "stereoCalDir"

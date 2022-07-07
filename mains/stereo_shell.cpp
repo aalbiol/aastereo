@@ -14,10 +14,10 @@
 #include "opencv2/core.hpp"
 //#include "cxmisc.h"
 
-#include <demonio_comun.h>
-#include <midemonio.h>
+// #include <demonio_comun.h>
+// #include <midemonio.h>
 
-#define cimg_plugin "cimg_gpiv.h"
+//#define cimg_plugin "cimg_gpiv.h"
 //#define cimg_plugin1 "cimgcvMat.h"
 #include "CImg.h"
 
@@ -137,7 +137,7 @@ int main(int argc, char **argv)
 
 	if(showColorDepth) {
 		std::string title2 = "Color Depth";
-		CImg<unsigned char> tmp = rectLeft.get_tocolor();
+		CImg<unsigned char> tmp = rectLeft.get_resize(-100,-100,-100,3);
 		cimgstereo.depthAsColor(tmp);
 		tmp.display(title2.c_str(),false);
 	}

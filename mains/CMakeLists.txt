@@ -1,4 +1,4 @@
-SET(LIBRARIES stereoUPV cimg_gpiv  utilities)
+SET(LIBRARIES stereoUPV   utilities)
 #demonio_comun
 SET(EXTERNAL_LIBS ${SYSTEM_LIBS})
 
