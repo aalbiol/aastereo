@@ -1,0 +1,32 @@
+<!-- Sample Stereo Config file --> 
+<stereo_sensor>
+
+  <stereoInputFormat> 
+	<left> UL </left> <!-- Valid values: L, R , U , D,  UL/LU , UR/RU , DR/RD , DL/DL --> 
+	<right> UR </right>
+  </stereoInputFormat>
+
+  <stereoCalDir> cal </stereoCalDir>
+  
+  <DisparityMethod> BM </DisparityMethod> <!-- optional. Default: BM . Values BM / SGBM / SV --> 
+  
+  <!-- Distances in metres -->   
+  <minDistance> 0.700 </minDistance>
+  <maxDistance> 3.000 </maxDistance>
+  <SGBM_Smooth_Factor> 1.0 </SGBM_Smooth_Factor><!-- optional. Default: 1 --> 
+  <SADWinSize> 17 </SADWinSize>
+  <textureTh> 6 </textureTh>
+  <speckleWinSize> 0 </speckleWinSize>
+  <speckleRange> 2 </speckleRange>
+  <uniqueRatio> 15 </uniqueRatio>
+  <maxDispLR> 2 </maxDispLR> <!-- optional. -1: to disable. Typical 1 or 2 --> 
+  <decimate> 1 </decimate> <!-- 0: multi-scale  1:No decimation 2:decimate_by_2 -->
+  <MultiscaleMode> classic </MultiscaleMode>  <!-- optional. Values: classic robust -->
+  <scale> 1.0 </scale> <!-- optional. Default 1 (image not scaled). -->
+  <AlphaRectify> 0 </AlphaRectify><!-- 0: sin zonas negras 1: todos los pixels originales. -->
+ <!-- Camera extrinsics are optional --> 
+  	<camera_extrinsics>
+		<cameraHeight_metres> 2.7 </cameraHeight_metres>	
+		<matrix_filename> matrix.dlm </matrix_filename>
+	</camera_extrinsics>	
+</stereo_sensor>

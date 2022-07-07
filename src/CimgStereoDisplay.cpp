@@ -257,10 +257,10 @@ void CimgStereoDisplay::display(std::string &texto_A)
 	CimgSt_p->getDisparity_type(StMosaic.disparity_type);
 	StMosaic.DepthColor = StMosaic.Left.get_resize(-100,-100,-100,3);
 
-	if(CimgSt_p->exist_rotationMatrix())
-		CimgSt_p->Y_AsColor(StMosaic.DepthColor);
-	else
-		CimgSt_p->depthAsColor(StMosaic.DepthColor);
+	// if(CimgSt_p->exist_rotationMatrix())
+	// 	CimgSt_p->Y_AsColor(StMosaic.DepthColor);
+	// else
+	// 	CimgSt_p->depthAsColor(StMosaic.DepthColor);
 	CimgSt_p->getXYZ(StMosaic.xyz);
 	StMosaic.texto = texto_A;
 

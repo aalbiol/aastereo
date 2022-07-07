@@ -120,7 +120,7 @@ public:
 	int read_input_config( const char * filename);
 
 	void SGBM_SmoothFactor( float f){ SGBM_SmoothFactor_ = f;}
-	void depthAsColor(cimg_library::CImg<unsigned char> & depthcolor);
+	void depthAsColor(cimg_library::CImg<float> & depthcolor);
 	void Y_AsColor(cimg_library::CImg<unsigned char> & depthcolor);
 	int getNumCameras() const { return (layoutCenter_ > 0? 3 :2) ;}
 

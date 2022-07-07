@@ -396,8 +396,6 @@ int CimgStereo::start() {
 		//				imageSize_rect, (Rect*) 0, (Rect*)0, int (CV_CALIB_ZERO_DISPARITY) );
 	}
 
-
-
 	std::cout << "done\nBuilding Rectification maps..." ;
 
 	cv::initUndistortRectifyMap(M1e, D1, R1, P1, imageSize_rect, CV_16SC2, map11, map12);
@@ -419,6 +417,25 @@ int CimgStereo::start() {
 	baseLine = cimg_Q(2,3);
 	baseLine = std::fabs(1.0 / baseLine);
 
+std::cout << "\nrectifiedCamFocal: " << rectifiedCamFocal << "  baseLine: " << baseLine << "\n";
+
+//CImg<float> cimgT(T);
+baseLine = cv::norm(T);
+float effective_focal = P1.at<double>(0,0);
+
+maxDisparity = effective_focal * baseLine/ (1000*minimumDistance);
+minDisparity = effective_focal * baseLine/ (1000*maximumDistance);
+
+float dif_centros=	P2.at<double>(0,2)-P1.at<double>(0,2);	
+
+std::cout << "\n\nBaseline: " << baseLine << " effective focal: " << effective_focal << "\n";
+std::cout << "Min Distance: " << minimumDistance << " maxdistance: " << maximumDistance;
+std:: cout << "\nmax_disparity: " << maxDisparity << " min_disparity:" << minDisparity;
+std::cout << "\ndif_centros: " << dif_centros << "\n";
+
+std::cout <<"T=" << T << "\n";
+std::cout<< "\nP1=" << P1 << "\n";
+std::cout<< "P2=" << P2 << "\n";
 
 
 	if (layoutCenter_ < 0) { // 2 cams
@@ -476,14 +493,15 @@ int CimgStereo::start() {
 
 		if(decimate > 0)
 		{
-			minDisparity = 0;
-			maxDisparity = ceil( rectifiedCamFocal * baseLine / (minimumDistance * 1000.0) );
+			//minDisparity = 0;
+			//maxDisparity = ceil( rectifiedCamFocal * baseLine / (minimumDistance * 1000.0) );
 
 			int disparities = ceil( ( maxDisparity - minDisparity) / 16.0) * 16.0;
 			int disparities2 = ceil( ( maxDisparity - minDisparity) / 32.0) * 16.0;
 			std::cout << "Min.Disparity =  "<< minDisparity;
+			std::cout << " Min.Disparity Configured=  "<<minDisparity-dif_centros << "\n";
 			std::cout <<"MaxDisparity=" << maxDisparity <<  " Number of disparities: " << disparities <<  "   Number of disparities2: " << disparities2<< "\n";
-
+			minDisparity-=dif_centros;
 			//bm.state->minDisparity = minDisparity;
 			//bm.state->numberOfDisparities = disparities;
 			//sgbm.minDisparity = minDisparity;
@@ -1169,7 +1187,16 @@ int CimgStereo::depth()
 int CimgStereo::reproject3D()
 {
 
-	CImg<float> c_disparity((float *) disp.data, disp.cols, disp.rows, 1, 1,true);
+Mat coordenadas3D;
+cv::reprojectImageTo3D	(	disp,	coordenadas3D, Q);
+
+
+ 	CImg<float> c_disparity((float *) disp.data, disp.cols, disp.rows, 1, 1,true);
+// 	c_depth3D.assign(coordenadas3D);
+// c_disparity.display("disparity cimg");
+// c_depth3D.get_shared_channel(2).display("Z");
+
+// return 0;
 
 	c_depth3D.assign(c_disparity.width() , c_disparity.height(), 1, 3);
 
@@ -1207,7 +1234,7 @@ int CimgStereo::reproject3D()
 
 
 
-	cw *= 1000.0;  //Output in metres
+	//cw *= 1000.0;  //Output in metres
 	//	C_Q.display("Q");
 
 	cimg_forXY(c_disparity, x, y)
@@ -1215,7 +1242,7 @@ int CimgStereo::reproject3D()
 		int offset = x + y * c_disparity.width();
 		double dd = c_disparity[offset];
 		if( dd >= minDisparity) {
-			double W =  cw * dd ;
+			double W =  cw * dd + dw ;
 			double Z =  dz;
 			//		double Y =  by * y + dy;
 			//		double X = ax * x  + dx;
@@ -1227,7 +1254,7 @@ int CimgStereo::reproject3D()
 
 			if(W !=0 )
 			{
-				double d = Z / W;
+				double d = Z / W /1000;
 				if (fabs(d) < maximumDistance && fabs(d) > minimumDistance)
 				{
 					Xp[offset] =  X / W;
@@ -1253,7 +1280,7 @@ int CimgStereo::reproject3D()
 		}
 
 	}
-
+//c_depth3D.get_shared_channel(2).display("ZZ");
 	return 0;
 }
 
@@ -1910,24 +1937,25 @@ void CimgStereo::dispuchar2dispfloat(const cv::Mat & dsh, cv::Mat &dfl)
 
 }
 
-void CimgStereo::depthAsColor(cimg_library::CImg<unsigned char> & depthcolor)
+void CimgStereo::depthAsColor(cimg_library::CImg<float> & depthcolor)
 {
 	if (LUT.size() == 0)
 		createLUT();
 	CImg<float> de = xyz().get_shared_slice(2);
 
+	CImg<unsigned char> rectLeft( img1r.data, img1r.cols, img1r.rows, 1, 1,false);
+	depthcolor = rectLeft.get_resize(-100, -100, -100, 4);
 	//	depthcolor.assign ( de.width(), de.height(), 0, 3);
-	if(!depthcolor.is_sameXY(de) || depthcolor.spectrum() != 3)
-	{
-		std::cerr << "Error en depthAsColor\n";
-		return;
-	}
+
 	float opacity = 0.5;
 	float opacity_1 = 1- opacity;
 	isnan(5.0);
+	depthcolor.get_shared_channel(3).fill(0);
 	cimg_forX(depthcolor, x)
 	cimg_forY(depthcolor, y){
+		
 		float f = de(x,y);
+		float depth =f;
 		if ( isnan( f ) )
 			continue;
 		f = (f - minimumDistance) / (maximumDistance - minimumDistance) * 255.0;
@@ -1935,25 +1963,16 @@ void CimgStereo::depthAsColor(cimg_library::CImg<unsigned char> & depthcolor)
 		int ff = f;
 		if(ff > 255)
 		{
-			if(!warning_bad_depthasColor)
-			{
-				std::cerr << "warning 2 en depthAsColor, (" << x <<","<< y << ")" << "level (min0,max255)=" << ff<<"\n";
-				warning_bad_depthasColor=1;
-			}
 			ff=255;
 		}
 		else if (ff <0)
 		{
-			if(!warning_bad_depthasColor)
-			{
-				std::cerr << "warning 2 en depthAsColor, (" << x <<","<< y << ")" << "level (min0,max255)=" << ff<<"\n";
-				warning_bad_depthasColor=1;
-			}
+
 			ff=0;
 		}
 		cimg_forC( depthcolor, c)
 		depthcolor(x,y,0,c) = opacity * LUT(ff,0,0,c) + opacity_1 * depthcolor(x,y,0,c);
-
+		depthcolor(x,y,0,3) = depth;
 	}
 }
 

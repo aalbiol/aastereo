@@ -316,6 +316,7 @@ int main(int argc, char *argv[]) {
 			}else{
 				sprintf(buff,"mosaicST_%08d.jpg",ii);
 				std::string filename = buff;
+				if(ii%5==0)
 				cv::imwrite(filename, mosaico);
 			}
 			std::cerr << "imagen: "<< ii<< "\n";
